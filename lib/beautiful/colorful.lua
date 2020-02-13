@@ -221,11 +221,12 @@ end
 -- {{{ color.new()
 
 --- Create a new color instance
+--
+-- @DOC_beautiful_colorful_new_EXAMPLE@
+--
 -- @param val A CSS color compatible string, decimal color value, or a table
 -- containing 3 or 4 values.
 -- @return A new color object, or nil if invalid
--- @usage local c = colorful.color.new({30, 0.8, 0.6})
--- -- For more examples see the top of this page
 function color.new(val)
     if type(val) == "string" then return color.from.string(val) end
     if type(val) == "number" then
@@ -713,9 +714,11 @@ local color_patterns = {
 -- }}} Color patterns
 
 --- Create a new color instance from a string
+--
+-- @DOC_beautiful_colorful_from_string_EXAMPLE@
+--
 -- @tparam string str A CSS color compatible string.
 -- @return A new color object, or nil if invalid
--- @usage local c = colorful.color.from.string("rgb(255, 204, 153)")
 function color.from.string(str)
     for _,pat in pairs(color_patterns) do
         local t = pat[1]
@@ -789,17 +792,21 @@ end
 
 --- Create a new color instance from an RGB decimal value.
 -- Will bitshift decimal 2 bytes left and call `color.from.hex4`
+--
+-- @DOC_beautiful_colorful_from_hex3_EXAMPLE@
+--
 -- @tparam number hex A decimal describing an RGB color
 -- @return A new color object, or nil if invalid
--- @usage local c = colorful.color.from.hex3(0xffcc99)
 function color.from.hex3(hex)
     return color.from.hex4(lshift(hex, 8) + 0xff)
 end
 
 --- Create a new color instance from an RGBA decimal value.
+--
+-- @DOC_beautiful_colorful_from_hex4_EXAMPLE@
+--
 -- @tparam number hex A decimal describing an RGBA color
 -- @return A new color object, or nil if invalid
--- @usage local c = colorful.color.from.hex4(0xffcc99ff)
 function color.from.hex4(hex)
     -- shift right 24 bits, 0s shifted in
     local r = rshift(hex, 24)
@@ -815,12 +822,14 @@ end
 -- {{{ RGB
 
 --- Create a new color instance from RGBA values.
+--
+-- @DOC_beautiful_colorful_from_rgba_EXAMPLE@
+--
 -- @tparam number r Red decimal value 0-255
 -- @tparam number g Green decimal value 0-255
 -- @tparam number b Blue decimal value 0-255
 -- @tparam number a Alpha decimal value 0-255
 -- @return A new color object, or nil if invalid
--- @usage local c = colorful.color.from.rgba(255, 204, 153, 255)
 function color.from.rgba(r,g,b,a)
     -- put r,g,b,a into [0,1]
     r = clamp(r, 0, 255) / 255
@@ -834,11 +843,13 @@ end
 
 --- Create a new color instance from RGB values.
 -- Will call `color.from.rgba` with an Alpha value of 255
+--
+-- @DOC_beautiful_colorful_from_rgb_EXAMPLE@
+--
 -- @tparam number r Red decimal value 0-255
 -- @tparam number g Green decimal value 0-255
 -- @tparam number b Blue decimal value 0-255
 -- @return A new color object, or nil if invalid
--- @usage local c = colorful.color.from.rgb(255, 204, 153)
 function color.from.rgb(r,g,b)
     return color.from.rgba(r,g,b,255)
 end
@@ -848,12 +859,14 @@ end
 -- {{{ HSL
 
 --- Create a new color instance from HSLA values.
+--
+-- @DOC_beautiful_colorful_from_hsla_EXAMPLE@
+--
 -- @tparam number h Hue decimal value 0-360
 -- @tparam number s Saturation float value 0-1
 -- @tparam number l Lightness float value 0-1
 -- @tparam number a Alpha float value 0-1
 -- @return A new color object, or nil if invalid
--- @usage local c = colorful.color.from.hsla(30, 0.8, 0.6, 1)
 function color.from.hsla(h,s,l,a)
     -- hue is adjustable as it's degrees
     if not between(h, 0, 360) then
@@ -872,11 +885,13 @@ end
 
 --- Create a new color instance from HSL values.
 -- Will call `color.from.hsla` with an Alpha value of 1
+--
+-- @DOC_beautiful_colorful_from_hsl_EXAMPLE@
+--
 -- @tparam number h Hue decimal value 0-360
 -- @tparam number s Saturation float value 0-1
 -- @tparam number l Lightness float value 0-1
 -- @return A new color object, or nil if invalid
--- @usage local c = colorful.color.from.hsl(30, 0.8, 0.6)
 function color.from.hsl(h,s,l)
     return color.from.hsla(h,s,l,1)
 end
@@ -911,11 +926,13 @@ local function calcval(v,s,e)
 end
 
 --- Returns the mix of a color with another by a specified amount
+--
+-- @DOC_beautiful_colorful_self_mix_EXAMPLE@
+--
 -- @tparam beautiful.colorful.color c A color object
 -- @tparam[opt=0.5] number v A number [0,1] of how much of the origin color
 -- should be mixed with c.
 -- @return A new color object representing the mix of the two colors, or nil if invalid
--- @usage local mixed_color = c:mix(c2, 0.5)
 function color:mix(c, v)
     if v == nil then v = 0.5 end
     if v < 0 or v > 1 then return nil end
@@ -927,8 +944,10 @@ function color:mix(c, v)
 end
 
 --- Returns the inverse of a color
+--
+-- @DOC_beautiful_colorful_self_invert_EXAMPLE@
+--
 -- @return A new color object representing the inverted color, or nil if invalid
--- @usage local inverted_color = c:invert()
 function color:invert()
     local red = clamp(1 - self.red, 0, 1) * 255
     local green = clamp(1 - self.green, 0, 1) * 255
@@ -941,18 +960,22 @@ end
 -- {{{ HSL-adjusting functions
 
 --- Returns a color darkened by a specified amount
+--
+-- @DOC_beautiful_colorful_self_darken_EXAMPLE@
+--
 -- @tparam number v A number [0,1] of how much to decrease Lightness
 -- @return A new color object representing the darkened color, or nil if invalid
--- @usage local darker_color = c:darken(0.25)
 function color:darken(v)
     local lightness = clamp(self.lightness - v, 0, 1)
     return color.from.hsla(self.hue, self.saturation, lightness, self.alpha)
 end
 
 --- Returns a color lightened by a specified amount
+--
+-- @DOC_beautiful_colorful_self_lighten_EXAMPLE@
+--
 -- @tparam number v A number [0,1] of how much to increase Lightness
 -- @return A new color object representing the lightened color, or nil if invalid
--- @usage local lighter_color = c:lighten(0.25)
 function color:lighten(v)
     local lightness = clamp(self.lightness + v, 0, 1)
     return color.from.hsla(self.hue, self.saturation, lightness, self.alpha)
@@ -978,8 +1001,10 @@ end
 
 --- Returns the grayscale of a color
 -- Reduces Saturation to 0
+--
+-- @DOC_beautiful_colorful_self_grayscale_EXAMPLE@
+--
 -- @return A new color object representing the grayscaled color, or nil if invalid
--- @usage local grayscaled_color = c:grayscale()
 function color:grayscale()
     return color.from.hsla(self.hue, 0, self.lightness, self.alpha)
 end
@@ -1208,6 +1233,9 @@ setmetatable(color, {
 -- @section wrappers
 
 --- Mix two colors with optional mix amount
+--
+-- @DOC_beautiful_colorful_mix_EXAMPLE@
+--
 -- @param color1 A CSS color compatible string, decimal color value, or a table
 -- containing 3 or 4 values.
 -- @param color2 A CSS color compatible string, decimal color value, or a table
@@ -1217,7 +1245,6 @@ setmetatable(color, {
 -- @treturn string The string representation of the mixed color in `#rrggbbaa`
 -- format.
 -- @see beautiful.colorful.color.mix
--- @usage local mix_str = colorful.mix("#ffcc99", "#99ccff", 0.5)
 function colorful.mix(color1, color2, amount)
     local c1 = color.new(color1)
     local c2 = color.new(color2)
@@ -1226,13 +1253,15 @@ function colorful.mix(color1, color2, amount)
 end
 
 --- Darken a color by an amount
+--
+-- @DOC_beautiful_colorful_darken_EXAMPLE@
+--
 -- @param _color A CSS color compatible string, decimal color value, or a table
 -- containing 3 or 4 values.
 -- @tparam number amount A number [0,1] of how much to darken color.
 -- @treturn string The string representation of the mixed color in `#rrggbbaa`
 -- format.
 -- @see beautiful.colorful.color.darken
--- @usage local dark_str = colorful.darken("#ffcc99", 0.25)
 function colorful.darken(_color, amount)
     local c1 = color.new(_color)
     if c1 == nil then return nil end
@@ -1240,13 +1269,15 @@ function colorful.darken(_color, amount)
 end
 
 --- Lighten a color by an amount
+--
+-- @DOC_beautiful_colorful_lighten_EXAMPLE@
+--
 -- @param _color A CSS color compatible string, decimal color value, or a table
 -- containing 3 or 4 values.
 -- @tparam number amount A number [0,1] of how much to lighten color.
 -- @treturn string The string representation of the mixed color in `#rrggbbaa`
 -- format.
 -- @see beautiful.colorful.color.lighten
--- @usage local light_str = colorful.lighten("#ffcc99", 0.25)
 function colorful.lighten(_color, amount)
     local c1 = color.new(_color)
     if c1 == nil then return nil end
@@ -1254,12 +1285,14 @@ function colorful.lighten(_color, amount)
 end
 
 --- Invert a color
+--
+-- @DOC_beautiful_colorful_invert_EXAMPLE@
+--
 -- @param _color A CSS color compatible string, decimal color value, or a table
 -- containing 3 or 4 values.
 -- @treturn string The string representation of the mixed color in `#rrggbbaa`
 -- format.
 -- @see beautiful.colorful.color.invert
--- @usage = local invert_str = colorful.invert("#ffcc99")
 function colorful.invert(_color)
     local c1 = color.new(_color)
     if c1 == nil then return nil end
@@ -1267,12 +1300,14 @@ function colorful.invert(_color)
 end
 
 --- Grayscale a color
+--
+-- @DOC_beautiful_colorful_grayscale_EXAMPLE@
+--
 -- @param _color A CSS color compatible string, decimal color value, or a table
 -- containing 3 or 4 values.
 -- @treturn string The string representation of the mixed color in `#rrggbbaa`
 -- format.
 -- @see beautiful.colorful.color.grayscale
--- @usage local grayed_str = colorful.grayscale("#ffcc99")
 function colorful.grayscale(_color)
     local c1 = color.new(_color)
     if c1 == nil then return nil end
